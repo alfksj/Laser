@@ -4,10 +4,8 @@
 
 #include "../header/io.h"
 #include "../header/StringLib.h"
-
-#define NO_NECESSARY_ARG_PROVIDED 0x1
-#define MULTI_INPUT_FILES 0x2
-#define NO_START_POINT_FOUND 0x4
+#include "../header/executor.h"
+#include "../header/exceptions.h"
 
 using namespace std;
 
@@ -52,7 +50,7 @@ int main(int argc, char *args[]) {
         argument_set.push_back(commandArgument(args[i]));
         if(argument_set.back().getType()==1) {
             if(input_location != -1) {
-                cout << "ERROR " << MULTI_INPUT_FILES << ": Multi input files is not allowed. Specify only one file.";
+                cout << "ERROR " << MULTI_INPUT_FILES << ": Multi input files is not allowed. Specify only one file." << endl;
                 return MULTI_INPUT_FILES;
             }
             input_location = i;
@@ -60,7 +58,7 @@ int main(int argc, char *args[]) {
     }
 
     if(input_location==-1) {
-        cout << "ERROR " << NO_NECESSARY_ARG_PROVIDED << ": No input file given\n";
+        cout << "ERROR " << NO_NECESSARY_ARG_PROVIDED << ": No input file given\n" << endl;
         return NO_NECESSARY_ARG_PROVIDED;
     }
 
@@ -81,10 +79,10 @@ int main(int argc, char *args[]) {
     } catch(const int errCode) {
         switch (errCode) {
         case FILE_NOT_FOUND:
-            cout << "ERROR " << FILE_NOT_FOUND << ": Input file \"" << args[input_location] << "\" is not found";
+            cout << "ERROR " << FILE_NOT_FOUND << ": Input file \"" << args[input_location] << "\" was not found" << endl;
             break;
         default:
-            cout << "Unknown exception code: " << errCode;
+            cout << "Unknown exception code: " << errCode << endl;
             break;
         }
         return errCode;
@@ -95,6 +93,7 @@ int main(int argc, char *args[]) {
         int startAddr=-1;
         vector<string> preProcess;
         for(unsigned long long int i=0; i<line.size(); i++) {
+            if(line.at(i)[0]=='#') continue;
             if(isContain(line.at(i), START_ANNOTATION)) {
                 startAddr=i;
             }
@@ -105,16 +104,24 @@ int main(int argc, char *args[]) {
         for(size_t i=startAddr+1; i<line.size(); i++) {
             try {
                 string ln = line[i];
-                string instruction = getInstruction(ln);
-                
+                //comment
+                if(ln[0]=='#') continue;
+                pair<string,string> parsedLine = getInstruction(ln);
+                string instruction = parsedLine.first, command = parsedLine.second;
+                pair<int,string> ret = execute(instruction, command);
+                if(ret.first==0) cout << "ERROR: Abnormal reply from code runner: " << ret.second << endl;
+                else if(ret.first==EXIT) return 0;
             } catch(const int errCode) {
                 switch (errCode)
                 {
                 case NO_INSTRUCTION_FOUND:
                     cout << "ERROR " << NO_INSTRUCTION_FOUND << ": " << "No instruction found at line " << i+1 << endl;
                     break;
+                case UNKNOWN_INSTRUCTION_EXCEPTION:
+                    cout << "ERROR " << UNKNOWN_INSTRUCTION_EXCEPTION << ": " << "Unknown instrcution at line " << i+1 << endl;
+                    break;
                 default:
-                    cout << "Unknown exception code: " << errCode;
+                    cout << "Unknown exception code: " << errCode << endl;
                     break;
                 }
             }
@@ -122,12 +129,14 @@ int main(int argc, char *args[]) {
     } catch(const int errCode) {
         switch (errCode) {
         case NO_START_POINT_FOUND:
-            cout << "ERROR " << NO_START_POINT_FOUND << ": No start point found. Use \"start from here\" to define start point.";
+            cout << "ERROR " << NO_START_POINT_FOUND << ": No start point found. Use \"start\" to define start point." << endl;
             break;
         default:
-            cout << "Unknown exception code: " << errCode;
+            cout << "Unknown exception code: " << errCode << endl;
             break;
         }
         return errCode;
     }
+    cout << "WARNING " << NO_EXIT_COMMAND << ": No exit command found. Please use \"end\" to define end point of the program." << endl;
+    return 1;
 }

@@ -1,7 +1,7 @@
 #include <string>
-#include "../header/StringLib.h"
-
 #include <iostream>
+#include "../header/StringLib.h"
+#include "../header/exceptions.h"
 
 using namespace std;
 
@@ -49,9 +49,9 @@ string toLowerCase(string plainText) {
     return ret;
 }
 
-string getInstruction(string line) {
+pair<string,string> getInstruction(string line) {
     for(size_t i=0; i<line.size(); i++) {
-        if(line[i]==' ') return line.substr(0,i+1);
+        if(line[i]==' ') return make_pair(line.substr(0,i), line.substr(i+1,line.size()));
     }
-    throw NO_INSTRUCTION_FOUND;
+    return make_pair(line,"");
 }

@@ -1,6 +1,7 @@
 #include <fstream>
 #include <string>
 #include "../header/io.h"
+#include "../header/exceptions.h"
 
 using namespace std;
 

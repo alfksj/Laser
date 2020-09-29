@@ -1,0 +1,15 @@
+#ifndef EXCEPTIONS_H
+    #define EXCEPTIONS_H
+
+    //ERROR
+    #define NO_NECESSARY_ARG_PROVIDED 0x1
+    #define MULTI_INPUT_FILES 0x2
+    #define FILE_NOT_FOUND 0x3
+    #define NO_START_POINT_FOUND 0x4
+    #define NO_INSTRUCTION_FOUND 0x5
+    #define UNKNOWN_INSTRUCTION_EXCEPTION 0x6
+
+    //WARNING
+    #define NO_EXIT_COMMAND 0x7
+
+#endif

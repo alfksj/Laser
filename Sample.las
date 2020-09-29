@@ -1,4 +1,6 @@
 This program is surely nothing!
-Start from here
+Start! Let's go!
 import stdio
-Hi
+# ok, start!
+hi
+end
