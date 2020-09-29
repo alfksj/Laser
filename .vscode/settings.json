@@ -1,8 +1,5 @@
 {
     "files.associations": {
-        "fstream": "cpp",
-        "vector": "cpp",
-        "string": "cpp",
-        "xstring": "cpp"
+        "*.tcc": "cpp"
     }
 }
